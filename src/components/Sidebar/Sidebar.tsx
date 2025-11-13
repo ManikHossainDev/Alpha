@@ -1,212 +1,155 @@
 "use client";
-import { useState } from "react";
-import Link from "next/link";
-import { MenuOutlined } from "@ant-design/icons";
-import { Drawer, Menu, Modal } from "antd";
+import { Modal, Drawer } from "antd";
+import { FiLogOut } from "react-icons/fi";
 import Image from "next/image";
-import usericon from "@/assets/Sidebar/user.png";
-import work from "@/assets/Sidebar/work.png";
-import job from "@/assets/Sidebar/vactor.png";
-import logout from "@/assets/Sidebar/Group.png";
+import Link from "next/link";
+import profile from "@/assets/Authentication/profile.png";
+import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { BsClipboardCheckFill,  } from "react-icons/bs";
+import { FaUser } from "react-icons/fa";
+import { AiFillHome } from "react-icons/ai";
 
+interface SidebarProps {
+  drawerOpen: boolean;
+  closeDrawer: () => void;
+}
 
-const Sidebar = () => {
-  const [drawerOpen, setDrawerOpen] = useState(false);
+const Sidebar: React.FC<SidebarProps> = ({ drawerOpen, closeDrawer }) => {
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
-
-  const showDrawer = () => setDrawerOpen(true);
-  const closeDrawer = () => setDrawerOpen(false);
+  const pathname = usePathname();
 
   const showLogoutModal = () => setLogoutModalVisible(true);
   const handleLogoutCancel = () => setLogoutModalVisible(false);
   const handleLogoutConfirm = () => {
     setLogoutModalVisible(false);
-    // Add logout logic here, such as clearing auth tokens or redirecting
     console.log("User logged out");
   };
 
   const menuItems = [
-    {
-      key: "jobs",
-      label: (
-        <div className="flex items-center space-x-2">
-          <Image src={work} width={40} height={40} alt="Work Icon" />
-          <span>Job</span>
-        </div>
-      ),
-      children: [
-        {
-          key: "jobpost",
-          label: (
-            <Link
-              href="/jobpost"
-              className="py-3 flex justify-start space-x-1 items-center"
-              onClick={closeDrawer} // Close drawer when item is clicked
-            >
-              <h1 className="w-2 h-2 p-2 bg-red-500 rounded-full mr-2"></h1> Create Job Post
-            </Link>
-          ),
-        },
-        {
-          key: "viewjobs",
-          label: (
-            <Link
-              href="viewjobs"
-              className="py-3 flex justify-start space-x-1 items-center"
-              onClick={closeDrawer} // Close drawer when item is clicked
-            >
-              <h1 className="w-2 h-2 p-2 bg-red-500 rounded-full mr-2"></h1> View Jobs
-            </Link>
-          ),
-        },
-        {
-          key: "bidjob",
-          label: (
-            <Link
-              href="/bidjob"
-              className="py-3 flex justify-start space-x-1 items-center"
-              onClick={closeDrawer} // Close drawer when item is clicked
-            >
-              <h1 className="w-2 h-2 p-2 bg-red-500 rounded-full mr-2"></h1> Job Quotations
-            </Link>
-          ),
-        },
-        {
-          key: "invoicepaper",
-          label: (
-            <Link
-              href="/invoicepaper"
-              className="py-3 flex justify-start space-x-1 items-center"
-              onClick={closeDrawer} // Close drawer when item is clicked
-            >
-              <h1 className="w-2 h-2 p-2 bg-red-500 rounded-full mr-2"></h1> Invoices
-            </Link>
-          ),
-        },
-      ],
-    },
+    { name: "Home", icon: <AiFillHome  size={28} />, href: "/todos" },
+    { name: "Todos", icon: <BsClipboardCheckFill size={24} />, href: "/todos" },
+    { name: "Account Information", icon: <FaUser size={24} />, href: "/account" },
   ];
 
-  return (
-    <div className="w-full">
-      {/* Mobile Drawer Button */}
-      <button
-        type="button"
-        className="md:hidden   rounded fixed"
-        onClick={showDrawer}
-      >
-        <MenuOutlined />
-      </button>
+  const renderMenuItem = (item: typeof menuItems[0], closeDrawerFn?: () => void) => {
+    const isActive = pathname === item.href;
+    return (
+      <Link href={item.href} key={item.name} onClick={closeDrawerFn}>
+        <div
+          className={`flex items-center px-6 py-4 cursor-pointer transition
+            ${isActive
+              ? "bg-gradient-to-r from-[#1D3574] to-[#1d36744b]"
+              : "hover:bg-gradient-to-r hover:from-[#1D3574] hover:to-[#1d36744b]"
+            }`}
+        >
+          <span className="mr-4">{item.icon}</span>
+          <span>{item.name}</span>
+        </div>
+      </Link>
+    );
+  };
 
-      {/* Drawer for Mobile */}
+  return (
+    <>
+      {/* Mobile Drawer */}
       <Drawer
         placement="left"
-        closable
         onClose={closeDrawer}
         open={drawerOpen}
-        className="p-0 rounded-md bg-[#FBE9E9] border border-[#F4BBBB]" // Set the background color for the drawer
+        width={260}
+        styles={{ body: { backgroundColor: "#0D224A", padding: 0 } }}
       >
-        <nav className="h-full p-4 space-y-4 bg-[#FBE9E9]"> {/* Full height and background color */}
-          <Link href="/profile">
-            <div
-              className="flex items-center ml-8 py-5 space-x-2"
-              onClick={closeDrawer}
+        <nav className="h-full flex flex-col bg-[#0D224A] text-white">
+          {/* Profile */}
+          <div className="flex flex-col items-center py-8 border-b border-gray-600">
+            <div className="w-24 h-24 rounded-full overflow-hidden mb-3 border-2 border-white">
+              <Image src={profile} alt="Profile" width={96} height={96} />
+            </div>
+            <h3 className="text-lg font-semibold">Manik Hossain</h3>
+            <p className="text-sm text-gray-300">se.manik.js@gmail.com</p>
+          </div>
+
+          {/* Menu */}
+          <div className="flex-1 py-6">
+            {menuItems.map((item) => renderMenuItem(item, closeDrawer))}
+          </div>
+
+          {/* Logout */}
+          <div className="border-t border-gray-600">
+            <button
+              onClick={() => {
+                closeDrawer();
+                showLogoutModal();
+              }}
+              className="w-full text-left"
             >
-              <Image src={usericon} width={40} height={40} alt="User Icon" />
-              <span>My Profile</span>
-            </div>
-          </Link>
-          <Menu
-            mode="inline"
-            defaultSelectedKeys={["profile"]}
-            items={menuItems}
-            className="bg-[#FBE9E9]"
-          />
-          <Link href="/incompletework">
-            <div
-              className="flex items-center ml-8 py-7 space-x-2"
-              onClick={closeDrawer}
-            >
-              <Image src={job} width={35} height={35} alt="Job Icon" />
-              <span>Job History</span>
-            </div>
-          </Link>
-          <button onClick={showLogoutModal} className="w-full text-left">
-            <div className="flex items-center ml-8 py-7 space-x-2">
-              <Image src={logout} width={40} height={40} alt="Logout Icon" />
-              <span>Logout</span>
-            </div>
-          </button>
+              <div className="flex items-center px-6 py-4 hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-800 cursor-pointer transition">
+                <FiLogOut size={24} className="mr-4" />
+                <span>Logout</span>
+              </div>
+            </button>
+          </div>
         </nav>
       </Drawer>
 
-      {/* Sidebar for Desktop */}
-      <aside className="hidden md:block bg-[#FBE9E9] w-64 px-4 rounded-md border border-[#F4BBBB]">
-        <div className="py-5">
-          <Link href="/profile">
-            <div className="flex ml-8 items-center space-x-2">
-              <Image src={usericon} width={40} height={40} alt="User Icon" />
-              <span>My Profile</span>
-            </div>
-          </Link>
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex md:flex-col bg-[#0D224A] text-white h-screen w-64 fixed left-0 top-0">
+        {/* Profile */}
+        <div className="flex flex-col items-center py-8 border-b border-gray-600">
+          <div className="w-24 h-24 rounded-full overflow-hidden mb-3 border-2 border-white">
+            <Image src={profile} alt="Profile" width={96} height={96} />
+          </div>
+          <h3 className="text-lg font-semibold">Manik Hossain</h3>
+          <p className="text-sm text-gray-300">se.manik.js@gmail.com</p>
         </div>
-        <div className="py-5">
-          <Menu
-            mode="inline"
-            defaultSelectedKeys={["profile"]}
-            items={menuItems}
-            className="bg-[#FBE9E9] hover:bg-none w-full "
-          />
+
+        {/* Menu */}
+        <div className="flex-1 py-6">
+          {menuItems.map((item) => renderMenuItem(item))}
         </div>
-        <div className="py-5">
-          <Link href="/incompletework">
-            <div className="flex items-center ml-8 space-x-2">
-              <Image src={job} width={32} height={32} alt="Job Icon" />
-              <span>Job Overview</span>
-            </div>
-          </Link>
-        </div>
-        <div className="pb-7 md:mt-32 lg:mt-32 xl:mt-48">
+
+        {/* Logout */}
+        <div className="border-t border-gray-600">
           <button onClick={showLogoutModal} className="w-full text-left">
-            <div className="flex items-center ml-8 space-x-2">
-              <Image src={logout} width={40} height={40} alt="Logout Icon" />
+            <div className="flex items-center px-6 py-4 hover:bg-gradient-to-r hover:from-[#1D3574] hover:to-[#1d36744b] cursor-pointer transition">
+              <FiLogOut size={24} className="mr-4" />
               <span>Logout</span>
             </div>
           </button>
         </div>
       </aside>
 
-      {/* Logout Confirmation Modal */}
+      {/* Logout Modal */}
       <Modal
-          visible={logoutModalVisible}
-          onOk={handleLogoutConfirm}
-          onCancel={handleLogoutCancel}
-          centered
-          width={300}  // Set the width here (in pixels)
-          height={300} // Set the height here (in pixels), if necessary
-          footer={[
+        open={logoutModalVisible}
+        onOk={handleLogoutConfirm}
+        onCancel={handleLogoutCancel}
+        centered
+        width={320}
+        footer={null}
+      >
+        <div className="py-4 ">
+          <h1 className="text-xl font-semibold mb-2">Logout</h1>
+          <p className="text-gray-600 mb-4">Are you sure you want to log out?</p>
+          <br />
+          <div className="flex justify-between ">
             <button
-            key="cancel"
-            onClick={handleLogoutCancel}
-            className="border border-red-500 text-red-500 px-4 py-1 rounded hover:bg-red-100"
-          >
-            No
-          </button>,
-          <button
-            key="confirm"
-            onClick={handleLogoutConfirm}
-            className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600 ml-5 mt-7"
-          >
-            Yes
-          </button>,
-          ]}
-        >
-          <div>
-            <h1 className="text-3xl font-semibold">Logout</h1>
-            <p className="mb-2">Are you sure you want to log out?</p>
+              onClick={handleLogoutCancel}
+              className="border border-gray-400 text-gray-700 px-5 py-2 rounded hover:bg-gray-100 transition"
+            >
+              No
+            </button>
+            <button
+              onClick={handleLogoutConfirm}
+              className="bg-red-500 text-white px-5 py-2 rounded hover:bg-red-600 transition"
+            >
+              Yes
+            </button>
           </div>
-        </Modal>
-    </div>
+        </div>
+      </Modal>
+    </>
   );
 };
 

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+
 import "./globals.css";
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -12,11 +13,29 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-export const metadata: Metadata = {
-  title: 'Event Websites',
-  description: 'Discover and book the best event venues, services, and organizers for weddings, conferences, parties, and more.'
-}
 
+export const metadata: Metadata = {
+  title: 'Todo Web Application',
+  description: 'A simple and efficient web application to manage your daily tasks.',
+  keywords: ['todo', 'tasks', 'productivity', 'web app'],
+  authors: [{ name: 'Manik Hossain', url: 'https://manikdev.vercel.app/' }],
+  openGraph: {
+    title: 'Todo Web Application',
+    description: 'Manage your daily tasks efficiently with our Todo Web App',
+    url: 'https://manikdev.vercel.app/',
+    siteName: 'Todo Web App',
+    images: [
+      {
+        url: '../assets/Authentication/profile.png', 
+        width: 1200,
+        height: 630,
+        alt: 'Todo Web App',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+};
 
 export default function RootLayout({
   children,
