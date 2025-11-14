@@ -4,11 +4,9 @@ import { useRouter } from "next/navigation";
 import InputComponent from "@/components/UI/InputComponent";
 import { MdEmail } from "react-icons/md";
 
-
 interface LoginFormValues {
   email: string;
 }
-
 const ForgotPassword: React.FC = () => {
   const router = useRouter();
 

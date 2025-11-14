@@ -6,12 +6,8 @@ import { useRouter } from "next/navigation";
 import InputComponent from "@/components/UI/InputComponent";
 import login from '@/assets/Authentication/login.png'
 import Image from "next/image";
+import { LoginFormValues } from "@/types/types";
 
-interface LoginFormValues {
-  email: string;
-  password: string;
-  remember: boolean;
-}
 
 const Login: React.FC = () => {
   const router = useRouter();

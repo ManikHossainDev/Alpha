@@ -1,119 +1,146 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client";
 import Link from "next/link";
-import { Form, Checkbox, } from "antd";
-import google from "@/assets/Authentication/google.png";
+import { Form } from "antd";
+import { useRouter } from "next/navigation";
 import InputComponent from "@/components/UI/InputComponent";
+import Register from '@/assets/Authentication/image.png'
 import Image from "next/image";
-import { FaLock, FaUserCircle } from "react-icons/fa";
-import { MdEmail } from "react-icons/md";
-import { GiPhone } from "react-icons/gi";
+import { RegisterFormValues } from "@/types/types";
 
-interface RegisterFormValues {
-  fullName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  remember: boolean;
-}
 
-const Register: React.FC = () => {
+
+const RegisterPage: React.FC = () => {
+  const router = useRouter();
+  
   const onFinish = (values: RegisterFormValues) => {
-    const registrationData = { ...values};
+    const registrationData = { ...values };
     console.log("Registration Data: ", registrationData);
+    router.push('/')
   };
 
   return (
-    <section className=" w-[90%] mx-auto  px-4 py-20 md:px-6 lg:px-10 bg-[#282828] rounded-md my-10 ">
-      <div className="w-full max-w-7xl mx-auto">
-          {/* Form Content */}
-          <div className="w-full max-w-[450px] mx-auto px-4 md:px-0">
-            <div className="bg-[#5E5E5E] shadow-lg rounded-lg border-[3px] border-white">
-              <div className="px-6 py-3 md:px-8 lg:px-10">
-                <h2 className="text-xl md:text-2xl font-semibold text-white text-center ">
-                  Create an Account
-                </h2>
-                <p className="text-center pb-2 text-white">Hello there, Let’s start your journey with us.</p>
-                <Form
-                  layout="vertical"
-                  onFinish={onFinish}
-                  className="space-y-3"
+    <section className="">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center h-full">
+        {/* Left side - Image */}
+        <div className="hidden md:block bg-[#E8EEF7]">
+          <Image 
+            src={Register} 
+            alt="Register illustration" 
+            className="w-full h-screen object-cover"
+            priority
+          />
+        </div>
+
+        {/* Right side - Form */}
+        <div className="">
+          <div className="px-6 md:py-8 md:px-8 lg:px-10 mt-5 md:mt-0 max-w-md mx-auto">
+            <h2 className="text-xl md:text-2xl font-semibold text-center">
+              Create your account
+            </h2>
+            <p className="text-center pb-5 text-gray-500 text-sm">
+              Start managing your tasks efficiently.
+            </p>
+            
+            <Form
+              layout="vertical"
+              onFinish={onFinish}
+              className="space-y-3"
+            >
+              {/* First Name and Last Name - Side by side */}
+              <div className="grid grid-cols-2 gap-4">
+                <Form.Item
+                  label={<span className="">First Name</span>}
+                  name="firstName"
+                  rules={[
+                    { required: true, message: "Please enter your first name" },
+                  ]}
                 >
-                  <Form.Item
-                    label={<span className="text-white">Company  Name</span>}
-                    name="fullName"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please enter your full name",
-                      },
-                    ]}
-                  >
-                    <InputComponent placeholder="Enter Name" icon={FaUserCircle} />
-                  </Form.Item>
-                  <Form.Item
-                    label={<span className="text-white">Company Email</span>}
-                    name="email"
-                    rules={[
-                      { required: true, message: "Please enter your email" },
-                      { type: "email", message: "Please enter a valid email" },
-                    ]}
-                  >
-                    <InputComponent placeholder="Enter Email" icon={MdEmail} />
-                  </Form.Item>
-                  <Form.Item
-                    label={<span className="text-white">Number Phone</span>}
-                    name="number"
-                    rules={[
-                      { required: true, message: "Please enter your Phone" },
-                    ]}
-                  >
-                    <InputComponent placeholder="Enter  Number"  icon={GiPhone} />
-                  </Form.Item>
-                  <Form.Item
-                    label={<span className="text-white">Password</span>}
-                    name="password"
-                    rules={[
-                      { required: true, message: "Please enter your password" },
-                    ]}
-                  >
-                    <InputComponent placeholder="Enter Password" isPassword={true} icon={FaLock} />
-                  </Form.Item>
-                  <Form.Item name="remember" valuePropName="checked">
-                    <Checkbox className="text-white">I accept the Terms of Service and Privacy Policy.</Checkbox>
-                  </Form.Item>
-                  <button className="w-full px-5 py-3 bg-red-500 rounded text-white">
-                  Sign up
-                  </button>
-                </Form>
-                <div className="mt-2 text-center font-bold">
-                  <span className="text-white">
-                  Already have an account?
-                  </span>
-                  <Link
-                    href="/login"
-                    className="text-white font-semibold hover:underline ml-1"
-                  >
-                  Login
-                  </Link>
-                </div>
-                <div className="flex items-center space-x-2 mt-2">
-                  <div className="border border-white md:w-[30%] w-[25%]"></div>
-                  <h1 className="text-white md:text-xl" >Or login with</h1>
-                  <div className="border border-white md:w-[30%] w-[25%]"></div>
-                </div>
-                <Image 
-                className="mx-auto mt-2"
-                    src={google}  
-                    width={50}                    
-                    height={50}                   
-                    alt="google"                   
-                  />
-                </div>
+                  <InputComponent placeholder="First Name" />
+                </Form.Item>
+
+                <Form.Item
+                  label={<span className="">Last Name</span>}
+                  name="lastName"
+                  rules={[
+                    { required: true, message: "Please enter your last name" },
+                  ]}
+                >
+                  <InputComponent placeholder="Last Name" />
+                </Form.Item>
               </div>
+
+              <Form.Item
+                label={<span className="">Email</span>}
+                name="email"
+                rules={[
+                  { required: true, message: "Please enter your email" },
+                  { type: "email", message: "Please enter a valid email" },
+                ]}
+              >
+                <InputComponent placeholder="Email" />
+              </Form.Item>
+
+              <Form.Item
+                label={<span className="">Password</span>}
+                name="password"
+                rules={[
+                  { required: true, message: "Please enter your password" },
+                  { min: 6, message: "Password must be at least 6 characters" },
+                ]}
+              >
+                <InputComponent 
+                  placeholder="Password" 
+                  isPassword={true} 
+                />
+              </Form.Item>
+
+              <Form.Item
+                label={<span className="">Confirm Password</span>}
+                name="confirmPassword"
+                dependencies={['password']}
+                rules={[
+                  { required: true, message: "Please confirm your password" },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue('password') === value) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(new Error('Passwords do not match'));
+                    },
+                  }),
+                ]}
+              >
+                <InputComponent 
+                  placeholder="Confirm Password" 
+                  isPassword={true} 
+                />
+              </Form.Item>
+
+              <button 
+                type="submit"
+                className="w-full px-5 py-3 bg-[#5272FF] hover:bg-blue-700 transition-colors rounded font-medium mt-4 text-white"
+              >
+                Sign Up
+              </button>
+            </Form>
+
+            <div className="mt-4 text-center">
+              <span className="text-gray-700">
+                Already have an account? 
+              </span>
+              <Link
+                href="/login"
+                className="text-[#5272FF] font-semibold hover:underline ml-1"
+              >
+                Log In
+              </Link>
             </div>
           </div>
+        </div>
+      </div>
     </section>
   );
 };
 
-export default Register;
+export default RegisterPage;
