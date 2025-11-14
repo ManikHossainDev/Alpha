@@ -121,7 +121,7 @@ const Page = () => {
   // Initialize ordered todos when data changes
   useEffect(() => {
     if (transformedTodos.length > 0) {
-      setOrderedTodos(transformedTodos.map((todo, index) => ({
+      setOrderedTodos(transformedTodos.map((todo:any, index:number) => ({
         ...todo,
         position: index + 1
       })));
