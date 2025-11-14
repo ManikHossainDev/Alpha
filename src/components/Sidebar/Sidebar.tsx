@@ -8,6 +8,9 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { BsClipboardCheckFill } from "react-icons/bs";
 import { FaUser } from "react-icons/fa";
+import { useAppDispatch } from "@/redux/hooks";
+import { logout } from "@/redux/features/auth/authSlice";
+import { useGetProfileQuery } from "@/redux/features/Profile/Profile";
 // import { AiFillHome } from "react-icons/ai";
 
 interface SidebarProps {
@@ -18,12 +21,15 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ drawerOpen, closeDrawer }) => {
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const pathname = usePathname();
+  const dispatch = useAppDispatch();
+
+   const { data } = useGetProfileQuery({});
 
   const showLogoutModal = () => setLogoutModalVisible(true);
   const handleLogoutCancel = () => setLogoutModalVisible(false);
   const handleLogoutConfirm = () => {
     setLogoutModalVisible(false);
-    console.log("User logged out");
+    dispatch(logout());
   };
 
   const menuItems = [
@@ -45,10 +51,11 @@ const Sidebar: React.FC<SidebarProps> = ({ drawerOpen, closeDrawer }) => {
       <Link href={item.href} key={item.name} onClick={closeDrawerFn}>
         <div
           className={`flex items-center px-6 py-4 cursor-pointer transition
-          ${isActive
+          ${
+            isActive
               ? "bg-gradient-to-r from-[#1D3574] to-[#1d36744b]"
               : "hover:bg-gradient-to-r hover:from-[#1D3574] hover:to-[#1d36744b]"
-            }`}
+          }`}
         >
           <span className="mr-4">{item.icon}</span>
           <span>{item.name}</span>
@@ -71,10 +78,10 @@ const Sidebar: React.FC<SidebarProps> = ({ drawerOpen, closeDrawer }) => {
           {/* Profile */}
           <div className="flex flex-col items-center py-8 border-b border-gray-600">
             <div className="w-24 h-24 rounded-full overflow-hidden mb-3 border-2 border-white">
-              <Image src={profile} alt="Profile" width={96} height={96} />
+              <Image src={data?.profile_image} alt="Profile" width={96} height={96} />
             </div>
-            <h3 className="text-lg font-semibold">Manik Hossain</h3>
-            <p className="text-sm text-gray-300">se.manik.js@gmail.com</p>
+            <h3 className="text-lg font-semibold">{data?.first_name + ' '  +  data?.last_name}</h3>
+            <p className="text-sm text-gray-300">{data?.email}</p>
           </div>
 
           {/* Menu */}
@@ -105,10 +112,10 @@ const Sidebar: React.FC<SidebarProps> = ({ drawerOpen, closeDrawer }) => {
         {/* Profile */}
         <div className="flex flex-col items-center py-8 border-b border-gray-600">
           <div className="w-24 h-24 rounded-full overflow-hidden mb-3 border-2 border-white">
-            <Image src={profile} alt="Profile" width={96} height={96} />
+            <Image src={data?.profile_image} alt="Profile" width={96} height={96} />
           </div>
-          <h3 className="text-lg font-semibold">Manik Hossain</h3>
-          <p className="text-sm text-gray-300">se.manik.js@gmail.com</p>
+          <h3 className="text-lg font-semibold">{data?.first_name + ' '  +  data?.last_name}</h3>
+          <p className="text-sm text-gray-300">{data?.email}</p>
         </div>
 
         {/* Menu */}

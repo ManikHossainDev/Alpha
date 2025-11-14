@@ -4,18 +4,50 @@ import Link from "next/link";
 import { Form, Checkbox, message } from "antd";
 import { useRouter } from "next/navigation";
 import InputComponent from "@/components/UI/InputComponent";
-import login from '@/assets/Authentication/login.png'
+import login from "@/assets/Authentication/login.png";
 import Image from "next/image";
 import { LoginFormValues } from "@/types/types";
-
+import Swal from "sweetalert2";
+import { useLoginMutation } from "@/redux/features/auth/authApi";
+import { useAppDispatch } from "@/redux/hooks";
+import { setUser } from "@/redux/features/auth/authSlice";
 
 const Login: React.FC = () => {
   const router = useRouter();
-  
-  const onFinish = (values: LoginFormValues) => {
-    console.log("Login Data: ", values);
-    message.success("Logged in successfully");
-    router.push("/");
+  const dispatch = useAppDispatch();
+  const [loginMutation] = useLoginMutation();
+  const onFinish = async (values: LoginFormValues) => {
+    const formData = new FormData();
+    formData.append("email", values.email);
+    formData.append("password", values.password);
+    try {
+      const res = await loginMutation(formData);
+      console.log(res);
+      if (res?.data?.access) {
+        
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Login   successfully!",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+        router.push("/");
+        const { access } = res.data;
+        dispatch(
+          setUser({
+            token: access,
+          })
+        );
+      }
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: `${error}`,
+      });
+    }
   };
 
   return (
@@ -23,9 +55,11 @@ const Login: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center h-full">
         {/* Left side - Image */}
         <div className="hidden  md:block">
-          <Image 
-            src={login} 
-            alt="Login illustration" 
+          <Image
+            src={login}
+            width={500}
+            height={500}
+            alt="Login illustration"
             className="w-full h-screen"
             priority
           />
@@ -33,19 +67,15 @@ const Login: React.FC = () => {
 
         {/* Right side - Form */}
         <div className="">
-          <div className="px-6 md:py-8 md:px-8 lg:px-10 mt-5 md:mt-0">
+          <div className="px-6 md:py-8 md:px-8 lg:px-10 mt-5 md:mt-0 max-w-xl mx-auto">
             <h2 className="text-xl md:text-2xl font-semibold  text-center">
               Log in to your account
             </h2>
             <p className="text-center pb-5 text-gray-300 text-sm">
               Start managing your tasks efficiently
             </p>
-            
-            <Form
-              layout="vertical"
-              onFinish={onFinish}
-              className="space-y-3"
-            >
+
+            <Form layout="vertical" onFinish={onFinish} className="space-y-3">
               <Form.Item
                 label={<span className="">Email</span>}
                 name="email"
@@ -54,7 +84,7 @@ const Login: React.FC = () => {
                   { type: "email", message: "Please enter a valid email" },
                 ]}
               >
-                <InputComponent  placeholder="Enter your email" />
+                <InputComponent placeholder="Enter your email" />
               </Form.Item>
 
               <Form.Item
@@ -64,15 +94,18 @@ const Login: React.FC = () => {
                   { required: true, message: "Please enter your password" },
                 ]}
               >
-                <InputComponent 
-                  placeholder="Enter your password" 
-         
-                  isPassword={true} 
+                <InputComponent
+                  placeholder="Enter your password"
+                  isPassword={true}
                 />
               </Form.Item>
 
               <div className="flex justify-between items-center ">
-                <Form.Item name="remember" valuePropName="checked" className="mb-0">
+                <Form.Item
+                  name="remember"
+                  valuePropName="checked"
+                  className="mb-0"
+                >
                   <Checkbox className="">Remember me</Checkbox>
                 </Form.Item>
                 <Link
@@ -83,7 +116,7 @@ const Login: React.FC = () => {
                 </Link>
               </div>
 
-              <button 
+              <button
                 type="submit"
                 className="w-full px-5 py-3 bg-blue-600 hover:bg-blue-700 transition-colors rounded  font-medium mt-4"
               >
@@ -92,9 +125,7 @@ const Login: React.FC = () => {
             </Form>
 
             <div className="mt-4 text-center">
-              <span className="text-gray-700">
-                Don't have an account? 
-              </span>
+              <span className="text-gray-700">Don't have an account?</span>
               <Link
                 href="/register"
                 className="text-[#5272FF] font-semibold hover:underline ml-1"
