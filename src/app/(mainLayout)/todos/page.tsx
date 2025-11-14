@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, FormEvent } from "react";
+import React, { useState, FormEvent, useEffect } from "react";
 import { Search, Plus, Calendar, Trash2 } from "lucide-react";
 import Image from "next/image";
 import notfund from "@/assets/Authentication/notfund.png";
@@ -23,6 +23,11 @@ const Page = () => {
   });
 
   const [todosCreate] = useCreateTodosMutation();
+  const [deleteTask] = useDeleteTodosMutation();
+
+  // State for ordered todos
+  const [orderedTodos, setOrderedTodos] = useState<any[]>([]);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
   const getPriorityColor = (priority: string) => {
     const priorityLower = priority.toLowerCase();
@@ -40,7 +45,6 @@ const Page = () => {
     }
   };
 
- 
   const handleAddTask = async (e: any) => {
     e.preventDefault();
     const form = e.target;
@@ -78,33 +82,30 @@ const Page = () => {
     }
   };
 
-
   const handleSearch = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
     setSearchTerm((form.search as HTMLInputElement).value);
   };
 
-
-  const  [deleteTask] = useDeleteTodosMutation();
   const handleDeleteTask = async (id: number) => {
-       try{
-         const res = await deleteTask(id)
-         if(res?.data){
-             Swal.fire({
+    try {
+      const res = await deleteTask(id);
+      if (res?.data) {
+        Swal.fire({
           icon: "success",
           title: "Delete",
           text: "Delete Successfully.",
           timer: 2000,
           showConfirmButton: false,
         });
-         }
-       }catch (error){
-          console.log(error)
-       }
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-
+  // Filter and transform todos
   const filteredTodos = allData.filter((todo: any) =>
     todo.title.toLowerCase().includes(searchTerm.toLowerCase()) 
   );
@@ -116,6 +117,47 @@ const Page = () => {
     priority: todo.priority,
     description: todo.description,
   }));
+
+  // Initialize ordered todos when data changes
+  useEffect(() => {
+    if (transformedTodos.length > 0) {
+      setOrderedTodos(transformedTodos.map((todo, index) => ({
+        ...todo,
+        position: index + 1
+      })));
+    }
+  }, [JSON.stringify(transformedTodos)]);
+
+  // Drag and Drop Handlers
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    
+    if (draggedIndex === null || draggedIndex === index) return;
+
+    const newTodos = [...orderedTodos];
+    const draggedItem = newTodos[draggedIndex];
+    
+    // Remove dragged item and insert at new position
+    newTodos.splice(draggedIndex, 1);
+    newTodos.splice(index, 0, draggedItem);
+    
+    // Update positions
+    const updatedTodos = newTodos.map((todo, idx) => ({
+      ...todo,
+      position: idx + 1
+    }));
+    
+    setOrderedTodos(updatedTodos);
+    setDraggedIndex(index);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+  };
 
   return (
     <div className="md:px-4 lg:pr-4">
@@ -187,20 +229,31 @@ const Page = () => {
           <div className="bg-white rounded-xl p-16 border text-center">
             <p className="text-gray-500 text-lg font-medium">Loading todos...</p>
           </div>
-        ) : transformedTodos.length === 0 ? (
+        ) : orderedTodos.length === 0 ? (
           <div className="bg-white rounded-xl p-16 border text-center">
             <Image src={notfund} alt="not found" width={260} height={260} />
             <p className="text-gray-500 text-lg font-medium mt-4">No todos found</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-4">
-            {transformedTodos.map((todo: TodoType) => (
-              <Card
+            {orderedTodos.map((todo, index) => (
+              <div
                 key={todo.id}
-                todo={todo}
-                getPriorityColor={getPriorityColor}
-                handleDeleteTask={handleDeleteTask}
-              />
+                draggable
+                onDragStart={() => handleDragStart(index)}
+                onDragOver={(e) => handleDragOver(e, index)}
+                onDragEnd={handleDragEnd}
+                className={`cursor-move transition-opacity ${
+                  draggedIndex === index ? 'opacity-50' : 'opacity-100'
+                }`}
+              >
+                <Card
+                  todo={todo}
+                  position={todo.position}
+                  getPriorityColor={getPriorityColor}
+                  handleDeleteTask={handleDeleteTask}
+                />
+              </div>
             ))}
           </div>
         )}
@@ -256,7 +309,6 @@ const Page = () => {
                       ))}
                     </div>
                   </div>
-
 
                   <div>
                     <label className="block text-sm font-medium mb-2">Description</label>

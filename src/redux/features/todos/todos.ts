@@ -17,20 +17,21 @@ const todos = baseApi.injectEndpoints({
       providesTags: ["tondos"],
     }),
     UpdateTodos: builder.mutation({
-      query: (data) => ({
-        url: "/api/users/me/",
-        method: "PATCH",
-        body: data,
-      }),
-      invalidatesTags: ["tondos"],
-    }),
-    deleteTodos: builder.mutation({
-      query: (id) => ({
-        url: `/api/todos/${id}`,
-        method: "DELETE",
-      }),
-      invalidatesTags:["tondos"]
-    }),
+  query: ({ id, data }) => ({
+    url: `/api/todos/${id}/`,
+    method: "PATCH",
+    body: data,
+  }),
+  invalidatesTags: ["tondos"],
+}),
+   deleteTodos: builder.mutation({
+  query: (id) => ({
+    url: `/api/todos/${id}/`,  
+    method: "DELETE",
+  }),
+  invalidatesTags: ["tondos"],
+}),
+
   }),
 });
 
