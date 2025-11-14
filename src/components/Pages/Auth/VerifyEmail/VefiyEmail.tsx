@@ -16,7 +16,7 @@ const VerifyEmail: React.FC = () => {
   };
 
   return (
-    <section className=" w-[90%] mx-auto h-[90vh] px-4 py-10 md:px-6 lg:px-10 bg-[#282828] my-10">
+    <section className=" w-[90%] mx-auto h-[90vh] px-4 py-10 md:px-6 lg:px-10  my-10">
       <div className="w-full max-w-7xl mx-auto">
           {/* OTP Form Content */}
           <div className="w-full max-w-[450px] mx-auto px-4 md:px-0">

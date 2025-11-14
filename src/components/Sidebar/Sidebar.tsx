@@ -6,9 +6,9 @@ import Link from "next/link";
 import profile from "@/assets/Authentication/profile.png";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { BsClipboardCheckFill,  } from "react-icons/bs";
+import { BsClipboardCheckFill } from "react-icons/bs";
 import { FaUser } from "react-icons/fa";
-import { AiFillHome } from "react-icons/ai";
+// import { AiFillHome } from "react-icons/ai";
 
 interface SidebarProps {
   drawerOpen: boolean;
@@ -27,18 +27,25 @@ const Sidebar: React.FC<SidebarProps> = ({ drawerOpen, closeDrawer }) => {
   };
 
   const menuItems = [
-    { name: "Home", icon: <AiFillHome  size={28} />, href: "/todos" },
+    // { name: "Home", icon: <AiFillHome size={28} />, href: "/" },
     { name: "Todos", icon: <BsClipboardCheckFill size={24} />, href: "/todos" },
-    { name: "Account Information", icon: <FaUser size={24} />, href: "/account" },
+    {
+      name: "Account Information",
+      icon: <FaUser size={24} />,
+      href: "/",
+    },
   ];
 
-  const renderMenuItem = (item: typeof menuItems[0], closeDrawerFn?: () => void) => {
+  const renderMenuItem = (
+    item: (typeof menuItems)[0],
+    closeDrawerFn?: () => void
+  ) => {
     const isActive = pathname === item.href;
     return (
       <Link href={item.href} key={item.name} onClick={closeDrawerFn}>
         <div
           className={`flex items-center px-6 py-4 cursor-pointer transition
-            ${isActive
+          ${isActive
               ? "bg-gradient-to-r from-[#1D3574] to-[#1d36744b]"
               : "hover:bg-gradient-to-r hover:from-[#1D3574] hover:to-[#1d36744b]"
             }`}
@@ -131,7 +138,9 @@ const Sidebar: React.FC<SidebarProps> = ({ drawerOpen, closeDrawer }) => {
       >
         <div className="py-4 ">
           <h1 className="text-xl font-semibold mb-2">Logout</h1>
-          <p className="text-gray-600 mb-4">Are you sure you want to log out?</p>
+          <p className="text-gray-600 mb-4">
+            Are you sure you want to log out?
+          </p>
           <br />
           <div className="flex justify-between ">
             <button

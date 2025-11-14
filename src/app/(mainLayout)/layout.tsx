@@ -14,7 +14,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const closeDrawer = () => setDrawerOpen(false);
 
   return (
-    <section className="min-h-screen bg-gray-50">
+    <section className="min-h-screen bg-[#EEF7FF]">
       <div className="flex">
         {/* Sidebar */}
         <aside className="fixed left-0 top-0 h-screen w-16 md:w-64 lg:w-72  z-20">
