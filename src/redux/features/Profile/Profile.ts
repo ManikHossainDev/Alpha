@@ -26,8 +26,8 @@ const Profile = baseApi.injectEndpoints({
   }),
 });
 
-export const { 
-  useGetProfileQuery, 
-  useUpdateProfileMutation, 
-  useDeleteProfileMutation, 
+export const {
+  useGetProfileQuery,
+  useUpdateProfileMutation,
+  useDeleteProfileMutation,
 } = Profile;

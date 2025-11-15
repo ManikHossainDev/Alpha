@@ -1,7 +1,11 @@
-
-
 "use client";
-import React, { useRef, useEffect, ChangeEvent, FormEvent } from "react";
+import React, {
+  useRef,
+  useEffect,
+  ChangeEvent,
+  FormEvent,
+  useState,
+} from "react";
 import { Camera, Upload, Calendar } from "lucide-react";
 import {
   useGetProfileQuery,
@@ -9,33 +13,34 @@ import {
 } from "@/redux/features/Profile/Profile";
 
 import Swal from "sweetalert2";
+import ClientOnlyImage from "@/components/ClientOnlyImage";
 
 const Page: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
-  const imagePreviewRef = useRef<HTMLImageElement | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const uploadStatusRef = useRef<HTMLParagraphElement | null>(null);
 
   const { data } = useGetProfileQuery({});
   const [UpdateProfile] = useUpdateProfileMutation();
 
-
   useEffect(() => {
-    if (imagePreviewRef.current && data?.profile_image) {
-      imagePreviewRef.current.src = data.profile_image;
-      imagePreviewRef.current.style.display = "block";
+    if (
+      data?.profile_image &&
+      typeof data.profile_image === "string" &&
+      data.profile_image.trim() !== ""
+    ) {
+      setImagePreview(data.profile_image);
     }
   }, [data]);
-
 
   const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && file.type.startsWith("image/")) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        if (imagePreviewRef.current) {
-          imagePreviewRef.current.src = reader.result as string;
-          imagePreviewRef.current.style.display = "block";
+        if (typeof reader.result === "string" && reader.result.trim() !== "") {
+          setImagePreview(reader.result);
         }
         if (uploadStatusRef.current) {
           uploadStatusRef.current.style.display = "block";
@@ -48,7 +53,6 @@ const Page: React.FC = () => {
   const handleUploadClick = () => {
     fileInputRef.current?.click();
   };
-
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -89,14 +93,14 @@ const Page: React.FC = () => {
           timer: 2000,
           showConfirmButton: false,
         });
-      } 
+      }
     } catch (error) {
       console.log(error);
       Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: `Something went wrong,: ${error}` ,
-        });
+        icon: "error",
+        title: "Error",
+        text: `Something went wrong,: ${error}`,
+      });
     }
   };
 
@@ -104,6 +108,16 @@ const Page: React.FC = () => {
     if (fileInputRef.current) fileInputRef.current.value = "";
     if (uploadStatusRef.current) {
       uploadStatusRef.current.style.display = "none";
+    }
+    // Reset to the original profile image from data
+    if (
+      data?.profile_image &&
+      typeof data.profile_image === "string" &&
+      data.profile_image.trim() !== ""
+    ) {
+      setImagePreview(data.profile_image);
+    } else {
+      setImagePreview(null);
     }
     formRef.current?.reset();
   };
@@ -125,14 +139,18 @@ const Page: React.FC = () => {
                   className="w-32 h-32 rounded-full bg-gray-300 overflow-hidden flex items-center justify-center cursor-pointer"
                   onClick={handleUploadClick}
                 >
-                  <Camera className="w-12 h-12 text-gray-400" />
-                  <img
-                    ref={imagePreviewRef}
-                    src=""
-                    alt="Profile"
-                    className="w-full h-full object-cover rounded-full absolute top-0 left-0"
-                    style={{ display: "none" }}
-                  />
+                  {imagePreview && imagePreview.trim() !== "" ? (
+                    <ClientOnlyImage
+                      src={imagePreview}
+                      alt="Profile"
+                      width={128}
+                      height={128}
+                      className="w-full h-full object-cover rounded-full"
+                      unoptimized={true}
+                    />
+                  ) : (
+                    <Camera className="w-12 h-12 text-gray-400" />
+                  )}
                 </div>
                 <div
                   className="absolute bottom-0 right-0 bg-blue-500 rounded-full p-2 shadow-lg cursor-pointer"

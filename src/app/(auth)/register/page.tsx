@@ -1,13 +1,13 @@
-import Register from '@/components/Pages/Auth/Register/Register'
-import React from 'react'
+import Register from "@/components/Pages/Auth/Register/Register";
+import React from "react";
 
 export const metadata = {
-    title: 'Register | Locksmit',
-    description: 'This is the registration page for our application',
-    keywords: ['registration', 'page', 'example']
-}
+  title: "Register | Locksmit",
+  description: "This is the registration page for our application",
+  keywords: ["registration", "page", "example"],
+};
 const RegisterPage = () => {
-  return <Register/>
-}
+  return <Register />;
+};
 
-export default RegisterPage
+export default RegisterPage;

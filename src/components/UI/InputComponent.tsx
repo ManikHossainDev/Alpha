@@ -5,8 +5,6 @@ import { TextAreaProps } from "antd/lib/input/TextArea";
 import { PasswordProps } from "antd/lib/input/Password";
 import { FC } from "react";
 
-
-
 interface InputComponentBaseProps {
   icon?: FC<{ className?: string }>;
   placeholder?: string;
@@ -16,11 +14,12 @@ interface InputComponentBaseProps {
   isTextArea?: boolean;
 }
 
-type InputComponentProps = InputComponentBaseProps & (
-  | (InputProps & { isPassword?: false; isTextArea?: false })
-  | (PasswordProps & { isPassword: true; isTextArea?: false })
-  | (TextAreaProps & { isTextArea: true; isPassword?: false })
-);
+type InputComponentProps = InputComponentBaseProps &
+  (
+    | (InputProps & { isPassword?: false; isTextArea?: false })
+    | (PasswordProps & { isPassword: true; isTextArea?: false })
+    | (TextAreaProps & { isTextArea: true; isPassword?: false })
+  );
 
 const InputComponent: FC<InputComponentProps> = ({
   icon: Icon,
@@ -49,7 +48,9 @@ const InputComponent: FC<InputComponentProps> = ({
         />
       ) : (
         <AntInput
-          prefix={Icon && <Icon className="text-black text-xl   rounded-full" />}
+          prefix={
+            Icon && <Icon className="text-black text-xl   rounded-full" />
+          }
           placeholder={placeholder || "Enter value"}
           className={`w-full px-4 py-3 text-[16px] text-black rounded-lg bg-[#E8F0FE] border-[#D1D5DB] placeholder:text-black border    ${className}`}
           type={type}
@@ -61,4 +62,3 @@ const InputComponent: FC<InputComponentProps> = ({
 };
 
 export default InputComponent;
-

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import Pagination from "react-responsive-pagination";
 
 interface PaginationComponentProps {

@@ -13,7 +13,6 @@ export interface FilterOptions {
   expires30Days: boolean;
 }
 
-
 export interface RegisterFormValues {
   firstName: string;
   lastName: string;
@@ -21,7 +20,6 @@ export interface RegisterFormValues {
   password: string;
   confirmPassword: string;
 }
-
 
 export interface LoginFormValues {
   email: string;

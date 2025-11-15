@@ -1,11 +1,14 @@
 "use client";
 import React, { useState, FormEvent, useEffect } from "react";
-import { Search, Plus, Calendar, Trash2 } from "lucide-react";
+import { Search, Plus, Calendar } from "lucide-react";
 import Image from "next/image";
 import notfund from "@/assets/Authentication/notfund.png";
 import Card from "@/components/Todos/Card";
-import { TodoType } from "@/types/types";
-import { useCreateTodosMutation, useDeleteTodosMutation, useGetTodosQuery } from "@/redux/features/todos/todos";
+import {
+  useCreateTodosMutation,
+  useDeleteTodosMutation,
+  useGetTodosQuery,
+} from "@/redux/features/todos/todos";
 import Swal from "sweetalert2";
 
 const Page = () => {
@@ -13,7 +16,7 @@ const Page = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { data, isLoading } = useGetTodosQuery({});
   const allData = data?.results || [];
-  
+
   const [showFilterMenu, setShowFilterMenu] = useState(false);
   const [filterOptions, setFilterOptions] = useState({
     deadlineToday: false,
@@ -26,8 +29,25 @@ const Page = () => {
   const [deleteTask] = useDeleteTodosMutation();
 
   // State for ordered todos
-  const [orderedTodos, setOrderedTodos] = useState<any[]>([]);
+  const [orderedTodos, setOrderedTodos] = useState<Todo[]>([]);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+
+  type Todo = {
+    id: number;
+    title: string;
+    date: string;
+    priority: "Extreme" | "Moderate" | "Low";
+    description: string;
+    position?: number;
+  };
+
+  type TodoData = {
+    id: number;
+    title: string;
+    todo_date: string;
+    priority: "Extreme" | "Moderate" | "Low";
+    description: string;
+  };
 
   const getPriorityColor = (priority: string) => {
     const priorityLower = priority.toLowerCase();
@@ -45,13 +65,16 @@ const Page = () => {
     }
   };
 
-  const handleAddTask = async (e: any) => {
+  const handleAddTask = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const form = e.target;
-    const title = form.title.value;
-    const date = form.date.value;
-    const priority = form.priority.value;
-    const description = form.description.value;
+    const form = e.target as HTMLFormElement;
+    const title = (form.elements.namedItem("title") as HTMLInputElement).value;
+    const date = (form.elements.namedItem("date") as HTMLInputElement).value;
+    const priority = (form.elements.namedItem("priority") as HTMLSelectElement)
+      .value;
+    const description = (
+      form.elements.namedItem("description") as HTMLTextAreaElement
+    ).value;
 
     const submitData = new FormData();
     submitData.append("title", title);
@@ -60,7 +83,8 @@ const Page = () => {
     submitData.append("todo_date", date);
 
     try {
-      const res: any = await todosCreate(submitData);
+      const res: { data?: Record<string, unknown> } =
+        await todosCreate(submitData);
       if (res?.data) {
         form.reset();
         setShowModal(false);
@@ -72,7 +96,7 @@ const Page = () => {
           timer: 2000,
           showConfirmButton: false,
         });
-      } 
+      }
     } catch (err) {
       Swal.fire({
         icon: "error",
@@ -106,11 +130,11 @@ const Page = () => {
   };
 
   // Filter and transform todos
-  const filteredTodos = allData.filter((todo: any) =>
-    todo.title.toLowerCase().includes(searchTerm.toLowerCase()) 
+  const filteredTodos = allData.filter((todo: TodoData) =>
+    todo.title.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  const transformedTodos = filteredTodos.map((todo: any) => ({
+  const transformedTodos = filteredTodos.map((todo: TodoData) => ({
     id: todo.id,
     title: todo.title,
     date: todo.todo_date,
@@ -121,10 +145,12 @@ const Page = () => {
   // Initialize ordered todos when data changes
   useEffect(() => {
     if (transformedTodos.length > 0) {
-      setOrderedTodos(transformedTodos.map((todo:any, index:number) => ({
-        ...todo,
-        position: index + 1
-      })));
+      setOrderedTodos(
+        transformedTodos.map((todo: Todo, index: number) => ({
+          ...todo,
+          position: index + 1,
+        })),
+      );
     }
   }, [JSON.stringify(transformedTodos)]);
 
@@ -135,24 +161,27 @@ const Page = () => {
 
   const handleDragOver = (e: React.DragEvent, index: number) => {
     e.preventDefault();
-    
+
     if (draggedIndex === null || draggedIndex === index) return;
 
-    const newTodos = [...orderedTodos];
-    const draggedItem = newTodos[draggedIndex];
-    
-    // Remove dragged item and insert at new position
-    newTodos.splice(draggedIndex, 1);
-    newTodos.splice(index, 0, draggedItem);
-    
-    // Update positions
-    const updatedTodos = newTodos.map((todo, idx) => ({
-      ...todo,
-      position: idx + 1
-    }));
-    
-    setOrderedTodos(updatedTodos);
-    setDraggedIndex(index);
+    // Avoid updating state on every drag over event, only rearrange when necessary
+    if (draggedIndex !== index) {
+      const newTodos = [...orderedTodos];
+      const draggedItem = newTodos[draggedIndex];
+
+      // Remove dragged item and insert at new position
+      newTodos.splice(draggedIndex, 1);
+      newTodos.splice(index, 0, draggedItem);
+
+      // Update positions
+      const updatedTodos = newTodos.map((todo, idx) => ({
+        ...todo,
+        position: idx + 1,
+      }));
+
+      setOrderedTodos(updatedTodos);
+      setDraggedIndex(index);
+    }
   };
 
   const handleDragEnd = () => {
@@ -173,7 +202,10 @@ const Page = () => {
           </button>
         </div>
 
-        <form onSubmit={handleSearch} className="flex gap-3 items-center mb-6 relative">
+        <form
+          onSubmit={handleSearch}
+          className="flex gap-3 items-center mb-6 relative"
+        >
           <div className="flex-1 relative">
             <input
               type="text"
@@ -193,13 +225,25 @@ const Page = () => {
               className="flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg bg-white hover:bg-gray-50"
             >
               <span className="text-gray-700 font-medium">Filter By</span>
-              <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              <svg
+                className="w-4 h-4 text-gray-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
               </svg>
             </button>
             {showFilterMenu && (
               <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-10">
-                <div className="font-medium text-gray-700 text-sm mb-2">Date</div>
+                <div className="font-medium text-gray-700 text-sm mb-2">
+                  Date
+                </div>
                 <div className="space-y-2">
                   {[
                     { label: "Deadline Today", key: "deadlineToday" },
@@ -210,13 +254,20 @@ const Page = () => {
                     <label key={item.key} className="flex items-center gap-2">
                       <input
                         type="checkbox"
-                        checked={filterOptions[item.key as keyof typeof filterOptions]}
+                        checked={
+                          filterOptions[item.key as keyof typeof filterOptions]
+                        }
                         onChange={(e) =>
-                          setFilterOptions({ ...filterOptions, [item.key]: e.target.checked })
+                          setFilterOptions({
+                            ...filterOptions,
+                            [item.key]: e.target.checked,
+                          })
                         }
                         className="w-4 h-4 text-indigo-600 border-gray-300 rounded"
                       />
-                      <span className="text-sm text-gray-700">{item.label}</span>
+                      <span className="text-sm text-gray-700">
+                        {item.label}
+                      </span>
                     </label>
                   ))}
                 </div>
@@ -227,12 +278,16 @@ const Page = () => {
 
         {isLoading ? (
           <div className="bg-white rounded-xl p-16 border text-center">
-            <p className="text-gray-500 text-lg font-medium">Loading todos...</p>
+            <p className="text-gray-500 text-lg font-medium">
+              Loading todos...
+            </p>
           </div>
         ) : orderedTodos.length === 0 ? (
           <div className="bg-white rounded-xl p-16 border text-center">
             <Image src={notfund} alt="not found" width={260} height={260} />
-            <p className="text-gray-500 text-lg font-medium mt-4">No todos found</p>
+            <p className="text-gray-500 text-lg font-medium mt-4">
+              No todos found
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-4">
@@ -244,7 +299,7 @@ const Page = () => {
                 onDragOver={(e) => handleDragOver(e, index)}
                 onDragEnd={handleDragEnd}
                 className={`cursor-move transition-opacity ${
-                  draggedIndex === index ? 'opacity-50' : 'opacity-100'
+                  draggedIndex === index ? "opacity-50" : "opacity-100"
                 }`}
               >
                 <Card
@@ -263,7 +318,10 @@ const Page = () => {
             <div className="bg-white rounded-xl w-full max-w-md shadow-lg">
               <div className="flex justify-between items-center p-6 border-b">
                 <h2 className="text-xl font-semibold">Add New Task</h2>
-                <button onClick={() => setShowModal(false)} className="text-indigo-600">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="text-indigo-600"
+                >
                   Close
                 </button>
               </div>
@@ -271,7 +329,9 @@ const Page = () => {
               <form onSubmit={handleAddTask}>
                 <div className="p-6 space-y-5">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Title</label>
+                    <label className="block text-sm font-medium mb-2">
+                      Title
+                    </label>
                     <input
                       type="text"
                       name="title"
@@ -281,7 +341,9 @@ const Page = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-2">Date</label>
+                    <label className="block text-sm font-medium mb-2">
+                      Date
+                    </label>
                     <div className="relative">
                       <input
                         type="date"
@@ -289,12 +351,17 @@ const Page = () => {
                         required
                         className="w-full px-4 py-2.5 border rounded-lg"
                       />
-                      <Calendar size={18} className="absolute right-3 top-3 text-gray-400" />
+                      <Calendar
+                        size={18}
+                        className="absolute right-3 top-3 text-gray-400"
+                      />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-2">Priority</label>
+                    <label className="block text-sm font-medium mb-2">
+                      Priority
+                    </label>
                     <div className="flex gap-4">
                       {["extreme", "moderate", "low"].map((item) => (
                         <label key={item} className="flex items-center gap-2">
@@ -311,7 +378,9 @@ const Page = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-2">Description</label>
+                    <label className="block text-sm font-medium mb-2">
+                      Description
+                    </label>
                     <textarea
                       name="description"
                       rows={4}
@@ -321,7 +390,10 @@ const Page = () => {
                 </div>
 
                 <div className="flex justify-between items-center p-6 border-t">
-                  <button type="submit" className="bg-indigo-600 text-white px-8 py-2.5 rounded-lg">
+                  <button
+                    type="submit"
+                    className="bg-indigo-600 text-white px-8 py-2.5 rounded-lg"
+                  >
                     Done
                   </button>
                 </div>

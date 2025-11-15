@@ -9,7 +9,6 @@ import { MdOutlineEmail } from "react-icons/md";
 import { RiPhoneLine } from "react-icons/ri";
 import Link from "next/link";
 
-
 const UserProfile = () => {
   return (
     <div className="px-2">
@@ -31,7 +30,9 @@ const UserProfile = () => {
           <div>
             <div className="md:flex items-center md:gap-2">
               <Upload>
-                <Button className="bg-red-500 text-white px-5 ">Change Picture</Button>
+                <Button className="bg-red-500 text-white px-5 ">
+                  Change Picture
+                </Button>
               </Upload>
               <Link href="/changepass">
                 <Button danger className="md:ml-2 mt-3 md:mt-0">
@@ -112,7 +113,6 @@ const UserProfile = () => {
               className="bg-transparent border border-black px-3 py-2 rounded-md"
             />
           </Form.Item>
-          
         </div>
 
         {/* Footer Section */}

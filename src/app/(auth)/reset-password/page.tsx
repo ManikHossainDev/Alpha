@@ -6,7 +6,7 @@ export const metadata = {
   keywords: ["reset password", "page", "example"],
 };
 const ResetPasswordPage = () => {
-  return <ResetPassword/>
+  return <ResetPassword />;
 };
 
 export default ResetPasswordPage;

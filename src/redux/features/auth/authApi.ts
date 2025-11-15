@@ -1,4 +1,5 @@
 import { baseApi } from "@/redux/api/baseApi";
+
 const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation({
@@ -50,7 +51,7 @@ const authApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
-     getSingleUser: builder.query({
+    getSingleUser: builder.query({
       query: (id) => ({
         url: `/auth/get-user-details-with-id?user_id=${id}`,
         method: "GET",
@@ -67,5 +68,5 @@ export const {
   useChangePasswordMutation,
   useVerifyEmailMutation,
   useVerifyAccountMutation,
-  useGetSingleUserQuery, 
+  useGetSingleUserQuery,
 } = authApi;

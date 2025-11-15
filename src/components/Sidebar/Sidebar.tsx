@@ -3,9 +3,8 @@ import { Modal, Drawer } from "antd";
 import { FiLogOut } from "react-icons/fi";
 import Image from "next/image";
 import Link from "next/link";
-import profile from "@/assets/Authentication/profile.png";
 import { useState } from "react";
-import { usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { BsClipboardCheckFill } from "react-icons/bs";
 import { FaUser } from "react-icons/fa";
 import { useAppDispatch } from "@/redux/hooks";
@@ -22,14 +21,16 @@ const Sidebar: React.FC<SidebarProps> = ({ drawerOpen, closeDrawer }) => {
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const pathname = usePathname();
   const dispatch = useAppDispatch();
+  const router = useRouter();
 
-   const { data } = useGetProfileQuery({});
+  const { data } = useGetProfileQuery({});
 
   const showLogoutModal = () => setLogoutModalVisible(true);
   const handleLogoutCancel = () => setLogoutModalVisible(false);
   const handleLogoutConfirm = () => {
-    setLogoutModalVisible(false);
     dispatch(logout());
+    router.push("/login");
+    setLogoutModalVisible(false);
   };
 
   const menuItems = [
@@ -44,7 +45,7 @@ const Sidebar: React.FC<SidebarProps> = ({ drawerOpen, closeDrawer }) => {
 
   const renderMenuItem = (
     item: (typeof menuItems)[0],
-    closeDrawerFn?: () => void
+    closeDrawerFn?: () => void,
   ) => {
     const isActive = pathname === item.href;
     return (
@@ -78,9 +79,22 @@ const Sidebar: React.FC<SidebarProps> = ({ drawerOpen, closeDrawer }) => {
           {/* Profile */}
           <div className="flex flex-col items-center py-8 border-b border-gray-600">
             <div className="w-24 h-24 rounded-full overflow-hidden mb-3 border-2 border-white">
-              <Image src={data?.profile_image} alt="Profile" width={96} height={96} />
+              {data?.profile_image && data.profile_image.trim() !== "" ? (
+                <Image
+                  src={data.profile_image}
+                  alt="Profile"
+                  width={96}
+                  height={96}
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                  <span className="text-gray-500">No Image</span>
+                </div>
+              )}
             </div>
-            <h3 className="text-lg font-semibold">{data?.first_name + ' '  +  data?.last_name}</h3>
+            <h3 className="text-lg font-semibold">
+              {data?.first_name + " " + data?.last_name}
+            </h3>
             <p className="text-sm text-gray-300">{data?.email}</p>
           </div>
 
@@ -112,9 +126,22 @@ const Sidebar: React.FC<SidebarProps> = ({ drawerOpen, closeDrawer }) => {
         {/* Profile */}
         <div className="flex flex-col items-center py-8 border-b border-gray-600">
           <div className="w-24 h-24 rounded-full overflow-hidden mb-3 border-2 border-white">
-            <Image src={data?.profile_image} alt="Profile" width={96} height={96} />
+            {data?.profile_image && data.profile_image.trim() !== "" ? (
+              <Image
+                src={data.profile_image}
+                alt="Profile"
+                width={96}
+                height={96}
+              />
+            ) : (
+              <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                <span className="text-gray-500">No Image</span>
+              </div>
+            )}
           </div>
-          <h3 className="text-lg font-semibold">{data?.first_name + ' '  +  data?.last_name}</h3>
+          <h3 className="text-lg font-semibold">
+            {data?.first_name + " " + data?.last_name}
+          </h3>
           <p className="text-sm text-gray-300">{data?.email}</p>
         </div>
 

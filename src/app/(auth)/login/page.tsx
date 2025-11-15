@@ -6,7 +6,7 @@ export const metadata = {
   keywords: ["login", "page", "example"],
 };
 const LoginPage = () => {
-  return <Login/>
+  return <Login />;
 };
 
 export default LoginPage;

@@ -123,7 +123,7 @@ const RegisterPage: React.FC = () => {
                         return Promise.resolve();
                       }
                       return Promise.reject(
-                        new Error("Passwords do not match")
+                        new Error("Passwords do not match"),
                       );
                     },
                   }),

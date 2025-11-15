@@ -8,7 +8,7 @@ import { useUpdateTodosMutation } from "@/redux/features/todos/todos";
 
 interface CardProps {
   todo: TodoType;
-   position?: number;
+  position?: number;
   handleDeleteTask: (id: number) => void;
   getPriorityColor: (priority: TodoType["priority"]) => string;
 }
@@ -23,43 +23,48 @@ const Card: React.FC<CardProps> = ({
 
   const [updateTodo] = useUpdateTodosMutation();
 
-  const handleUpdate = async (e: any) => {
+  const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const form = e.target;
+    const form = e.target as HTMLFormElement;
 
     const id = todo.id;
     const positions = position;
-    const title = form.title.value;
-    const date = form.date.value;
-    const priority = form.priority.value;
-    const description = form.description.value;
+    const title = (form.elements.namedItem("title") as HTMLInputElement).value;
+    const date = (form.elements.namedItem("date") as HTMLInputElement).value;
 
-    const is_completed: boolean = true;
+    const priorityElement = form.elements.namedItem("priority");
+    const priorityRadio = priorityElement as RadioNodeList;
+    const priority =
+      Array.from(priorityRadio as unknown as NodeListOf<HTMLInputElement>).find(
+        (radio) => radio.checked,
+      )?.value || todo.priority;
 
-    // ---- FormData Append ----
+    const description = (
+      form.elements.namedItem("description") as HTMLTextAreaElement
+    ).value;
+
     const submitData = new FormData();
     submitData.append("title", title);
     submitData.append("description", description);
     submitData.append("priority", priority);
     submitData.append("todo_date", date);
     submitData.append("position", String(positions));
-    submitData.append("is_completed", String(is_completed));
 
     try {
       const res = await updateTodo({ id, data: submitData }).unwrap();
-     console.log(res)
+      console.log(res);
       if (res) {
         setShowModal(false);
       }
     } catch (error) {
       console.log("Update error:", error);
+      setShowModal(false);
     }
   };
 
   return (
     <>
-      {/* CARD DISPLAY */}
       <div className="bg-white p-7 rounded-lg border hover:shadow-md transition-shadow">
         <div className="flex justify-between items-start mb-3">
           <h3 className="text-gray-900 text-base xl:text-xl font-bold">
@@ -69,7 +74,7 @@ const Card: React.FC<CardProps> = ({
           <div className="flex items-center gap-2">
             <span
               className={`px-2.5 py-1 rounded-md text-xs font-medium ${getPriorityColor(
-                todo.priority
+                todo.priority,
               )}`}
             >
               {todo.priority}
@@ -110,7 +115,6 @@ const Card: React.FC<CardProps> = ({
         </div>
       </div>
 
-      {/* UPDATE MODAL */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl w-full max-w-md shadow-lg">
@@ -126,7 +130,6 @@ const Card: React.FC<CardProps> = ({
 
             <form onSubmit={handleUpdate}>
               <div className="p-6 space-y-5">
-                {/* TITLE */}
                 <div>
                   <label className="block text-sm font-medium mb-2">
                     Title
@@ -140,7 +143,6 @@ const Card: React.FC<CardProps> = ({
                   />
                 </div>
 
-                {/* DATE */}
                 <div>
                   <label className="block text-sm font-medium mb-2">Date</label>
                   <div className="relative">
@@ -158,7 +160,6 @@ const Card: React.FC<CardProps> = ({
                   </div>
                 </div>
 
-                {/* PRIORITY */}
                 <div>
                   <label className="block text-sm font-medium mb-2">
                     Priority
@@ -178,7 +179,6 @@ const Card: React.FC<CardProps> = ({
                   </div>
                 </div>
 
-                {/* DESCRIPTION */}
                 <div>
                   <label className="block text-sm font-medium mb-2">
                     Description

@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
 import Link from "next/link";
-import { Form, Checkbox, message } from "antd";
+import { Form, Checkbox } from "antd";
 import { useRouter } from "next/navigation";
 import InputComponent from "@/components/UI/InputComponent";
 import login from "@/assets/Authentication/login.png";
@@ -24,7 +24,6 @@ const Login: React.FC = () => {
       const res = await loginMutation(formData);
       console.log(res);
       if (res?.data?.access) {
-        
         Swal.fire({
           icon: "success",
           title: "Success",
@@ -37,7 +36,7 @@ const Login: React.FC = () => {
         dispatch(
           setUser({
             token: access,
-          })
+          }),
         );
       }
     } catch (error) {

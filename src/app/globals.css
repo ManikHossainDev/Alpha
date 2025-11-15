@@ -1,14 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Outfit:wght@100..900&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Outfit:wght@100..900&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-*{
+* {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  
- font-family: "DM Sans", sans-serif;
+
+  font-family: "DM Sans", sans-serif;
   font-weight: 400;
   font-style: normal;
 }
@@ -39,13 +39,10 @@
 }
 
 .pagination-container .page-item.active {
-  background-color: #3FB249;
+  background-color: #3fb249;
   color: white;
 }
 
-
-.custom-class{
+.custom-class {
   background-color: b;
 }
-
-
